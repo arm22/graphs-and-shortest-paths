@@ -160,9 +160,61 @@ public class MyGraph implements Graph {
 	 *             if a or b does not exist.
 	 */
 	public Path shortestPath(Vertex a, Vertex b) {
+		//base cases
+		if (!vertList.contains(a) || !vertList.contains(b)) {
+			throw new IllegalArgumentException();
+		}
+		if (a.equals(b)) {
+			ArrayList<Vertex> temp = new ArrayList<Vertex>();
+			temp.add(a);
+			return new Path(temp, 0);
+		}
 
-		// YOUR CODE HERE (you might comment this out this method while doing
-		// Part 1)
+		Hashtable<Integer, Integer> costs = new Hashtable<Integer, Integer>();
+		Hashtable<Integer, Vertex> previous = new Hashtable<Integer, Vertex>();
+		BinaryHeap<Integer, Vertex> q = new BinaryHeap<Integer, Vertex>();
+		
+		//Makes all vertices besides source initially unknown with cost of 0
+		for (Vertex tempV : allVertexes) {
+			if (tempV.equals(a)) {
+				costs.put(tempV.hashCode(), 0);
+				q.insert(0, tempV);
+			} else {
+				costs.put(tempV.hashCode(), Integer.MAX_VALUE);
+				q.insert(Integer.MAX_VALUE, tempV);
+				//costs.put(tempV.hashCode(), 10000);
+				//q.insert(10000, tempV);
+			}
+		}
+		while (!q.isEmpty()) {
+			//Node with smallest path cost from the current
+			Vertex lowest = q.deleteMin();
+			
+			for (Vertex tempV : adjacentVertices(lowest)) { //all neighbors of lowest
+				int tempCost = costs.get(lowest.hashCode()) + edgeCost(lowest, tempV);
+				if (tempCost < costs.get(tempV.hashCode())) {
+					costs.put(tempV.hashCode(), tempCost);
+					previous.put(tempV.hashCode(), lowest);
+					q.decreaseKey(tempV, tempCost);
+				}
+			}
+		}
+		
+		//Return null if there is no path
+		if (!previous.containsKey(b.hashCode()) || costs.get(b.hashCode()) < 0) {
+			return null;
+		}
+		
+		//Reverse the order of previous to get the path of vertices
+		Vertex current = b;
+		List<Vertex> shortVertices = new ArrayList<Vertex>();
+		while (!current.equals(a)) {
+			shortVertices.add(current);
+			current = previous.get(current.hashCode());
+		}
+		shortVertices.add(a);
+		Collections.reverse(shortVertices);
+		return new Path(shortVertices, costs.get(b.hashCode()));
 
 	}
 

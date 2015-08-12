@@ -44,7 +44,7 @@ public class FindPaths {
 				System.exit(1);
 			}
 			
-			System.out.println("Shortest path from X to Y:");
+			System.out.println("Shortest path from X to Y: ");
 			Path curr = g.shortestPath(a, b);
 			if (curr == null) {
 				System.out.println("does not exist");
