@@ -77,8 +77,6 @@ public class TestGraph {
          testVertsSet.add(temp);
          System.out.println("Test Verts Hash Set is now " + testVertsSet.toString());
       }
-      
-      System.out.println("Correct Verts Array FINAL : " + correctVertsArray.toString());
       System.out.println("Test Verts Hash Set FINAL : " + testVertsSet.toString());
       
       if (testVertsSet.equals(mg.vertices())) {
@@ -136,6 +134,7 @@ public class TestGraph {
       
       System.out.println("Testing Shortest Path: ");
       
+      /**
       Path seaSfo = mg.shortestPath(sea, sfo);
       System.out.println("Testing SEA > SFO: ");
       System.out.println("Expected cost: 195 ");
@@ -143,6 +142,7 @@ public class TestGraph {
       if (seaSfo.cost != 195) {
          passed = false;
       }
+      
       Path sfoSea = mg.shortestPath(sfo, sea);
       System.out.println("Testing SFO > SEA: ");
       System.out.println("Expected cost: 193 ");
@@ -150,6 +150,7 @@ public class TestGraph {
       if (sfoSea.cost != 193) {
          passed = false;
       }
+      
       Path seaMkc = mg.shortestPath(sea, mkc);
       System.out.println("Testing SEA > MKC: ");
       System.out.println("Expected cost: 391 ");
@@ -157,6 +158,7 @@ public class TestGraph {
       if (seaMkc.cost != 391) {
          passed = false;
       }
+      
       Path laxJfk = mg.shortestPath(lax, jfk);
       System.out.println("Testing LAX > JFK: ");
       System.out.println("Expected cost: 692 ");
@@ -164,6 +166,7 @@ public class TestGraph {
       if (laxJfk.cost != 692) {
          passed = false;
       }
+      **/
       Path jfkLax = mg.shortestPath(jfk, lax);
       System.out.println("Testing JFK > LAX: ");
       System.out.println("Expected cost: 678 ");
@@ -171,6 +174,7 @@ public class TestGraph {
       if (jfkLax.cost != 678) {
          passed = false;
       }
+      
 
       if (passed) {
          System.out.println("All shortest path tests passed. ");
