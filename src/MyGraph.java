@@ -2,7 +2,6 @@
  * @UWNetID gegray, arm38
  * @studentID 1463717, 1228316
  * @email gegray@uw.edu, arm38@uw.edu
- * 
  */
 
 import java.util.*;
@@ -12,9 +11,8 @@ import java.util.*;
  * in the graph.
  */
 public class MyGraph implements Graph {
-	private Collection<Vertex> vertList;
-	private Collection<Edge> edgeList;
-	private Map<Vertex, Set<Edge>> graph;
+	private Map<Vertex, ArrayList<Edge>> graph;
+	private List<Edge> edges;
 
 	/**
 	 * Creates a MyGraph object with the given collection of vertices and the
@@ -28,48 +26,49 @@ public class MyGraph implements Graph {
 	public MyGraph(Collection<Vertex> v, Collection<Edge> e) {
 		if (v == null || v.size() == 0 || e == null || e.size() == 0) {
 			throw new IllegalArgumentException();
-		}
-		edgeList = new HashSet<Edge>();
-		graph = new HashMap<Vertex, Set<Edge>>();
+		}	
+		graph = new HashMap<Vertex, ArrayList<Edge>>();
+		edges = new ArrayList<Edge>();
 		
-		//Test if each edge passes input validation.
-		//Otherwise throw an exception.
-		for (Edge edge : e) {
-			if (edge.getWeight() < 0 || 
-				edge.getSource().equals(edge.getDestination()) || 
-				!v.contains(edge.getSource()) || 
-				!v.contains(edge.getDestination())) {
-					throw new IllegalArgumentException();
+		for(Vertex vert: v) {
+			if (!graph.containsKey(vert)) {
+				graph.put(vert, new ArrayList<Edge>());
 			}
-
-			//If an edge has the same dest 
-			//and the same source throw an exception 
-			//if their weights are not equal
-			for (Edge comp : e) {
-				if (comp.getSource().equals(edge.getSource()) &&
-					comp.getWeight() != edge.getWeight() &&
-					comp.getDestination().equals(edge.getDestination())) {
-						throw new IllegalArgumentException();
+		}
+		add(e);
+	}
+	/**
+	 * Adds edges into the global list of edges
+	 * 
+	 * @param e
+	 *            a collection of the edges in this graph
+	 */
+	private void add(Collection<Edge> e) {
+		for (Edge edge: e) {
+			
+			if (!graph.containsKey(edge.getSource()) || !graph.containsKey(edge.getDestination())) {
+				throw new IllegalArgumentException();
+			}
+			
+			if (edge.getWeight() < 0) {
+				throw new IllegalArgumentException();
+			}
+			
+			boolean found = false;
+			for (Edge validate : graph.get(edge.getSource())) {
+				
+				if (edge.getDestination().equals(validate.getDestination()) && edge.getWeight() != validate.getWeight()) {
+					throw new IllegalArgumentException();
+				}
+				
+				if (edge.getDestination().equals(validate.getDestination()) && edge.getWeight() == validate.getWeight()) {
+					found = !found;
 				}
 			}
-		}
-		// Adds edges to the map.
-		for (Edge edge: e) {
-			edgeList.add(edge);
-			Vertex parent = edge.getSource();
-			if (!graph.containsKey(parent)) {
-				graph.put(parent, new HashSet<Edge>());
-			} 			
-			graph.get(parent).add(edge);
-		}
-		
-		// Adds vertexes to the map
-		vertList = new HashSet<Vertex>();
-		for (Vertex vert: v) {
-			vertList.add(vert);
-			if (!graph.containsKey(vert)) {
-				graph.put(vert, new HashSet<Edge>());
-			}		
+			if (!found) {
+				edges.add(edge);
+				graph.get(edge.getSource()).add(edge);
+			}
 		}
 	}
 
@@ -80,7 +79,7 @@ public class MyGraph implements Graph {
 	 */
 	@Override
 	public Collection<Vertex> vertices() {
-		return vertList;
+		return graph.keySet();
 	}
 
 	/**
@@ -90,7 +89,7 @@ public class MyGraph implements Graph {
 	 */
 	@Override
 	public Collection<Edge> edges() {
-		return edgeList;
+		return edges;
 	}
 
 	/**
@@ -106,15 +105,15 @@ public class MyGraph implements Graph {
 	 */
 	@Override
 	public Collection<Vertex> adjacentVertices(Vertex v) {
-		if (!vertList.contains(v) || v == null) {
+		if (!graph.containsKey(v)) {
 			throw new IllegalArgumentException();
 		}
-		Set<Edge> edges = graph.get(v);
-		Collection<Vertex> adjacent = new HashSet<Vertex>();
-		for (Edge edge : edges) {
-			adjacent.add(edge.getDestination());
+		
+		List<Vertex> nodes = new ArrayList<Vertex>();
+		for (Edge edge : graph.get(v)) {
+			nodes.add(edge.getDestination());
 		}
-		return adjacent;
+		return nodes;
 	}
 
 	/**
@@ -132,14 +131,12 @@ public class MyGraph implements Graph {
 	 */
 	@Override
 	public int edgeCost(Vertex a, Vertex b) {
-		if (a == null || !vertList.contains(a) || b == null || !vertList.contains(b)) {
+		if (a == null || b == null) {
 			throw new IllegalArgumentException();
 		}
-		Set<Edge> edges = graph.get(a);
-		for (Edge edge : edges) {
-			if (edge.getDestination() == b) {
+		for (Edge edge : graph.get(a)) {
+			if (edge.getDestination().equals(b))
 				return edge.getWeight();
-			}
 		}
 		return -1;
 	}
@@ -161,28 +158,41 @@ public class MyGraph implements Graph {
 	 */
 	public Path shortestPath(Vertex a, Vertex b) {
 		if (!graph.containsKey(a) || !graph.containsKey(b))
-			return null;
+			throw new IllegalArgumentException();
 		List<Vertex> vertexes = new ArrayList<Vertex>();
 		if (a.equals(b)) {
 			vertexes.add(a);
 			return new Path(vertexes, 0);
 		}
 		for (Vertex vert: graph.keySet()) {
-			vert.weight = Integer.MAX_VALUE;
-			vert.found = false;
+			vert.dist = Integer.MAX_VALUE;
+			vert.visited = false;
 		}
-		PriorityQueue<Vertex> q = new PriorityQueue<Vertex>();
-		a.weight = 0;
-		q.add(a);
-		vertexes = dijkstra(q, b, graph.keySet());
-		return new Path(vertexes, b.weight);
+		PriorityQueue<Vertex> queue = new PriorityQueue<Vertex>();
+		a.dist = 0;
+		queue.add(a);
+		vertexes = dijkstra(queue, b, graph.keySet());
+		return new Path(vertexes, b.dist);
 	}
+	
+	/**
+	 * Uses Dijkstra's algorithm to find the shortest path
+	 * between 2 nodes. Returns a list of the vertexes with their paths
+	 * 
+	 * @param queue
+	 *            the priority queue
+	 * @param node
+	 *            the vertex
+	 * @param keys
+	 * 			  the set of vertexes' keys
+	 * @return a list of vertexes with their respective paths to the desired vertex
+	 */
+	private List<Vertex> dijkstra(PriorityQueue<Vertex> queue, Vertex node, Set<Vertex> keys) {
+		while (!queue.isEmpty()) {
+			Vertex curr = queue.poll();
+			curr.visited = true;
 
-	private List<Vertex> dijkstra(PriorityQueue<Vertex> q, Vertex b, Set<Vertex> keys) {
-		while(!q.isEmpty()) {
-			Vertex curr = q.poll();
-			curr.found = true;
-			for (Edge edge: graph.get(curr)) {
+			for (Edge edge : graph.get(curr)) {
 				Vertex next = null;
 				for (Vertex vert: keys) {
 					if (vert.equals(edge.getDestination())) {
@@ -190,27 +200,27 @@ public class MyGraph implements Graph {
 						break;
 					}
 				}
-				if (!next.found) {
-					int node1 = curr.weight + edge.getWeight();
-					int node2 = next.weight;
+				if (!next.visited) {
+					int node1 = curr.dist + edge.getWeight();
+					int node2 = next.dist;
 					if (node1 < node2) {
-						q.remove(next);
-						next.weight = node2;
+						queue.remove(next);
+						next.dist = node1;
 						next.path = curr;
-						q.add(next);
-						if (next.equals(b)) {
-							b.weight = next.weight;
-							b.path = next.path;
+						queue.add(next);
+						if (next.equals(node)) {
+							node.path = next.path;
+							node.dist = next.dist;
 						}
 					}
 				}
 			}
 		}
-		List<Vertex> set = new ArrayList<Vertex>();
-		for (Vertex vertex = b; vertex != null; vertex = vertex.path)
-			set.add(vertex);
-		Collections.reverse(set);
-		return set;
+		
+		List<Vertex> pathList = new ArrayList<Vertex>();
+		for (Vertex vert = node; vert != null; vert = vert.path)
+			pathList.add(vert);
+		Collections.reverse(pathList);
+		return pathList;
 	}
-
 }

@@ -4,8 +4,6 @@
  * @email gegray@uw.edu, arm38@uw.edu
  */
 
-
-
 import java.util.*;
 import java.io.*;
 
@@ -13,7 +11,6 @@ import java.io.*;
  * Driver program that reads in a graph and prompts user for shortests paths in the graph.
  * (Intentionally without comments.  Read through the code to understand what it does.)
  */
-
 public class FindPaths {
 	public static void main(String[] args) {
 		if(args.length != 2) {

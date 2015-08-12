@@ -1,12 +1,17 @@
-/**
+/** @author Geoff Gray, Austin Meyers
+ * @UWNetID gegray, arm38
+ * @studentID 1463717, 1228316
+ * @email gegray@uw.edu, arm38@uw.edu
+ *
  * Representation of a graph vertex
  */
 public class Vertex implements Comparable<Vertex> {
 	// label attached to this vertex
 	private String label;
-	public int weight;
-	public Vertex path;
-	public boolean found;
+	//Added these fields to use in MyGraph
+	public int dist; //distance field
+	public Vertex path; //path field
+	public boolean visited; //visited field
 
 	/**
 	 * Construct a new vertex
@@ -18,7 +23,7 @@ public class Vertex implements Comparable<Vertex> {
 		if (label == null)
 			throw new IllegalArgumentException("null");
 		this.label = label;
-		this.weight = Integer.MAX_VALUE;
+		this.dist = Integer.MAX_VALUE;
 	}
 
 	/**
@@ -62,8 +67,10 @@ public class Vertex implements Comparable<Vertex> {
 			return label.equals(other.label);
 		}
 	}
-	@Override
-	public int compareTo(Vertex curr) {
-		return Integer.compare(this.weight, curr.weight);
+
+	//Method that compares 2 vertexes
+	//Returns an integer comparing the vertexes
+	public int compareTo(Vertex comp) {
+		return Integer.compare(this.dist, comp.dist);
 	}
 }
