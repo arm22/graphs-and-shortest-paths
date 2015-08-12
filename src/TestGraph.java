@@ -10,7 +10,7 @@
 import java.io.*;    // file handling
 import java.util.*;  // multiple imports
 
-public class TestMyGraph {
+public class TestGraph {
 
    public void main(String[] args) {
       String input = "edge.txt";      // base, do not modify
@@ -94,6 +94,8 @@ public class TestMyGraph {
       }
       System.out.println();
    }
+   
+   
    
 }
 
