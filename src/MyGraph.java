@@ -106,9 +106,15 @@ public class MyGraph implements Graph {
 	 */
 	@Override
 	public Collection<Vertex> adjacentVertices(Vertex v) {
-
-		// YOUR CODE HERE
-
+		if (!vertList.contains(v) || v == null) {
+			throw new IllegalArgumentException();
+		}
+		Set<Edge> edges = graph.get(v);
+		Collection<Vertex> adjacent = new HashSet<Vertex>();
+		for (Edge edge : edges) {
+			adjacent.add(edge.getDestination());
+		}
+		return adjacent;
 	}
 
 	/**
@@ -126,9 +132,16 @@ public class MyGraph implements Graph {
 	 */
 	@Override
 	public int edgeCost(Vertex a, Vertex b) {
-
-		// YOUR CODE HERE
-
+		if (a == null || !vertList.contains(a) || b == null || !vertList.contains(b)) {
+			throw new IllegalArgumentException();
+		}
+		Set<Edge> edges = graph.get(a);
+		for (Edge edge : edges) {
+			if (edge.getDestination() == b) {
+				return edge.getWeight();
+			}
+		}
+		return -1;
 	}
 
 	/**
