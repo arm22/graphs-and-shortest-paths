@@ -1,3 +1,10 @@
+/** @author Geoff Gray, Austin Meyers
+ * @UWNetID gegray, arm38
+ * @studentID 1463717, 1228316
+ * @email gegray@uw.edu, arm38@uw.edu
+ * 
+ */
+
 import java.util.*;
 
 /**
@@ -5,10 +12,9 @@ import java.util.*;
  * in the graph.
  */
 public class MyGraph implements Graph {
-	// you will need some private fields to represent the graph
-	// you are also likely to want some private helper methods
-
-	// YOUR CODE HERE
+	private Collection<Vertex> vertList;
+	private Collection<Edge> edgeList;
+	private Map<Vertex, Set<Edge>> graph;
 
 	/**
 	 * Creates a MyGraph object with the given collection of vertices and the
@@ -20,9 +26,51 @@ public class MyGraph implements Graph {
 	 *            a collection of the edges in this graph
 	 */
 	public MyGraph(Collection<Vertex> v, Collection<Edge> e) {
+		if (v == null || v.size() == 0 || e == null || e.size() == 0) {
+			throw new IllegalArgumentException();
+		}
+		edgeList = new HashSet<Edge>();
+		graph = new HashMap<Vertex, Set<Edge>>();
+		
+		//Test if each edge passes input validation.
+		//Otherwise throw an exception.
+		for (Edge edge : e) {
+			if (edge.getWeight() < 0 || 
+				edge.getSource().equals(edge.getDestination()) || 
+				!v.contains(edge.getSource()) || 
+				!v.contains(edge.getDestination())) {
+					throw new IllegalArgumentException();
+			}
 
-		// YOUR CODE HERE
-
+			//If an edge has the same dest 
+			//and the same source throw an exception 
+			//if their weights are not equal
+			for (Edge comp : e) {
+				if (comp.getSource().equals(edge.getSource()) &&
+					comp.getWeight() != edge.getWeight() &&
+					comp.getDestination().equals(edge.getDestination())) {
+						throw new IllegalArgumentException();
+				}
+			}
+		}
+		// Adds edges to the map.
+		for (Edge edge: e) {
+			edgeList.add(edge);
+			Vertex parent = edge.getSource();
+			if (!graph.containsKey(parent)) {
+				graph.put(parent, new HashSet<Edge>());
+			} 			
+			graph.get(parent).add(edge);
+		}
+		
+		// Adds vertexes to the map
+		vertList = new HashSet<Vertex>();
+		for (Vertex vert: v) {
+			vertList.add(vert);
+			if (!graph.containsKey(vert)) {
+				graph.put(vert, new HashSet<Edge>());
+			}		
+		}
 	}
 
 	/**
@@ -32,9 +80,7 @@ public class MyGraph implements Graph {
 	 */
 	@Override
 	public Collection<Vertex> vertices() {
-
-		// YOUR CODE HERE
-
+		return vertList;
 	}
 
 	/**
@@ -44,9 +90,7 @@ public class MyGraph implements Graph {
 	 */
 	@Override
 	public Collection<Edge> edges() {
-
-		// YOUR CODE HERE
-
+		return edgeList;
 	}
 
 	/**

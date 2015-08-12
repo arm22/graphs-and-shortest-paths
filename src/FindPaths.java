@@ -1,3 +1,11 @@
+/** @author Geoff Gray, Austin Meyers
+ * @UWNetID gegray, arm38
+ * @studentID 1463717, 1228316
+ * @email gegray@uw.edu, arm38@uw.edu
+ */
+
+
+
 import java.util.*;
 import java.io.*;
 
@@ -36,8 +44,18 @@ public class FindPaths {
 				System.exit(1);
 			}
 			
-			// YOUR CODE HERE: call shortestPath and print
-			// out the result
+			System.out.println("Shortest path from X to Y:");
+			Path curr = g.shortestPath(a, b);
+			if (curr == null) {
+				System.out.println("does not exist");
+			} else {
+				List<Vertex> vertexList = curr.vertices;
+				for (int x = 0; x < vertexList.size() - 1; x++) {
+					System.out.print(vertexList.get(x).getLabel() + " ");
+				}
+				System.out.println(vertexList.get(vertexList.size()-1).getLabel());
+				System.out.println(curr.cost);
+			}
 		}
 	}
 
