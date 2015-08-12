@@ -160,62 +160,57 @@ public class MyGraph implements Graph {
 	 *             if a or b does not exist.
 	 */
 	public Path shortestPath(Vertex a, Vertex b) {
-		//base cases
-		if (!vertList.contains(a) || !vertList.contains(b)) {
-			throw new IllegalArgumentException();
-		}
+		if (!graph.containsKey(a) || !graph.containsKey(b))
+			return null;
+		List<Vertex> vertexes = new ArrayList<Vertex>();
 		if (a.equals(b)) {
-			ArrayList<Vertex> temp = new ArrayList<Vertex>();
-			temp.add(a);
-			return new Path(temp, 0);
+			vertexes.add(a);
+			return new Path(vertexes, 0);
 		}
+		for (Vertex vert: graph.keySet()) {
+			vert.weight = Integer.MAX_VALUE;
+			vert.found = false;
+		}
+		PriorityQueue<Vertex> q = new PriorityQueue<Vertex>();
+		a.weight = 0;
+		q.add(a);
+		vertexes = dijkstra(q, b, graph.keySet());
+		return new Path(vertexes, b.weight);
+	}
 
-		Hashtable<Integer, Integer> costs = new Hashtable<Integer, Integer>();
-		Hashtable<Integer, Vertex> previous = new Hashtable<Integer, Vertex>();
-		BinaryHeap<Integer, Vertex> q = new BinaryHeap<Integer, Vertex>();
-		
-		//Makes all vertices besides source initially unknown with cost of 0
-		for (Vertex tempV : allVertexes) {
-			if (tempV.equals(a)) {
-				costs.put(tempV.hashCode(), 0);
-				q.insert(0, tempV);
-			} else {
-				costs.put(tempV.hashCode(), Integer.MAX_VALUE);
-				q.insert(Integer.MAX_VALUE, tempV);
-				//costs.put(tempV.hashCode(), 10000);
-				//q.insert(10000, tempV);
-			}
-		}
-		while (!q.isEmpty()) {
-			//Node with smallest path cost from the current
-			Vertex lowest = q.deleteMin();
-			
-			for (Vertex tempV : adjacentVertices(lowest)) { //all neighbors of lowest
-				int tempCost = costs.get(lowest.hashCode()) + edgeCost(lowest, tempV);
-				if (tempCost < costs.get(tempV.hashCode())) {
-					costs.put(tempV.hashCode(), tempCost);
-					previous.put(tempV.hashCode(), lowest);
-					q.decreaseKey(tempV, tempCost);
+	private List<Vertex> dijkstra(PriorityQueue<Vertex> q, Vertex b, Set<Vertex> keys) {
+		while(!q.isEmpty()) {
+			Vertex curr = q.poll();
+			curr.found = true;
+			for (Edge edge: graph.get(curr)) {
+				Vertex next = null;
+				for (Vertex vert: keys) {
+					if (vert.equals(edge.getDestination())) {
+						next = vert;
+						break;
+					}
+				}
+				if (!next.found) {
+					int node1 = curr.weight + edge.getWeight();
+					int node2 = next.weight;
+					if (node1 < node2) {
+						q.remove(next);
+						next.weight = node2;
+						next.path = curr;
+						q.add(next);
+						if (next.equals(b)) {
+							b.weight = next.weight;
+							b.path = next.path;
+						}
+					}
 				}
 			}
 		}
-		
-		//Return null if there is no path
-		if (!previous.containsKey(b.hashCode()) || costs.get(b.hashCode()) < 0) {
-			return null;
-		}
-		
-		//Reverse the order of previous to get the path of vertices
-		Vertex current = b;
-		List<Vertex> shortVertices = new ArrayList<Vertex>();
-		while (!current.equals(a)) {
-			shortVertices.add(current);
-			current = previous.get(current.hashCode());
-		}
-		shortVertices.add(a);
-		Collections.reverse(shortVertices);
-		return new Path(shortVertices, costs.get(b.hashCode()));
-
+		List<Vertex> set = new ArrayList<Vertex>();
+		for (Vertex vertex = b; vertex != null; vertex = vertex.path)
+			set.add(vertex);
+		Collections.reverse(set);
+		return set;
 	}
 
 }

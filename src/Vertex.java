@@ -1,9 +1,12 @@
 /**
  * Representation of a graph vertex
  */
-public class Vertex {
+public class Vertex implements Comparable<Vertex> {
 	// label attached to this vertex
 	private String label;
+	public int weight;
+	public Vertex path;
+	public boolean found;
 
 	/**
 	 * Construct a new vertex
@@ -15,6 +18,7 @@ public class Vertex {
 		if (label == null)
 			throw new IllegalArgumentException("null");
 		this.label = label;
+		this.weight = Integer.MAX_VALUE;
 	}
 
 	/**
@@ -58,5 +62,8 @@ public class Vertex {
 			return label.equals(other.label);
 		}
 	}
-
+	@Override
+	public int compareTo(Vertex curr) {
+		return Integer.compare(this.weight, curr.weight);
+	}
 }
