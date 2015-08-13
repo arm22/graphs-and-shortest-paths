@@ -31,19 +31,20 @@ public class TestGraph {
 		Scanner s = null;
 		try {
 			s = new Scanner(new File(f1));
-		} catch(FileNotFoundException e1) {
-			System.err.println("FILE NOT FOUND: "+f1);
+		} catch (FileNotFoundException e1) {
+			System.err.println("FILE NOT FOUND: "+ f1);
 			System.exit(2);
 		}
 
 		Collection<Vertex> v = new ArrayList<Vertex>();
-		while(s.hasNext())
+		while (s.hasNext()) {
 			v.add(new Vertex(s.next()));
-
+      }
+      
 		try {
 			s = new Scanner(new File(f2));
 		} catch(FileNotFoundException e1) {
-			System.err.println("FILE NOT FOUND: "+f2);
+			System.err.println("FILE NOT FOUND: "+ f2);
 			System.exit(2);
 		}
 
